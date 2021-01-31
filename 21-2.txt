@@ -1,0 +1,42 @@
+const express = require('express');
+const path = require('path');
+const hbs = require('express-handlebars');
+
+
+const app = express();
+
+app.engine('hbs', hbs());
+app.set('view engine', 'hbs');
+
+
+app.use(express.static(path.join(__dirname, '/views/img')));
+
+app.use((req, res, next) => {
+  res.show = (name) => {
+    res.sendFile(path.join(__dirname, `/views/${name}`));
+  };
+  next();
+});
+app.use('/user/', (req, res, next) => {
+  res.show('forbiden.html');
+
+});
+app.get('/', (req, res) => {
+  res.show('home.html');
+});
+
+app.get('/about', (req, res) => {
+  res.show('about.html');
+});
+app.get('/hello/:name', (req, res) => {
+  res.render('hello.hbs', { name: req.params.name });
+});
+
+
+app.use((req, res) => {
+if (res.status(404)) {res.show('404.html');}
+})
+app.listen(8000, () => {
+  console.log('Server is running on port: 8000');
+});
+
